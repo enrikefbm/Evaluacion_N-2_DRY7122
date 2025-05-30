@@ -10,23 +10,10 @@ def obtener_info_ip(ip):
     try:
         response = requests.get(url)
         response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
-        print("Error al hacer la solicitud a ipapi.co:", e)
-        return None
-
-def obtener_capital(country_code):
-    if not country_code:
-        return None
-    url = f"https://restcountries.com/v3.1/alpha/{country_code}"
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
         data = response.json()
-        # Algunas respuestas pueden tener lista de capitales
-        return data[0].get("capital", [None])[0]
+        return data
     except requests.RequestException as e:
-        print("Error al obtener la capital del país:", e)
+        print("Error al hacer la solicitud:", e)
         return None
 
 def calcular_distancia(lat1, lon1, lat2, lon2):
@@ -40,26 +27,19 @@ def calcular_distancia(lat1, lon1, lat2, lon2):
     return distancia
 
 # Solicitar IP al usuario
-ip_usuario = input("Ingresa la IP del DNS que deseas consultar: ").strip()
+ip_usuario = input("🔎 Ingresa la IP del DNS que deseas consultar: ").strip()
 
 # Obtener y mostrar información
 info = obtener_info_ip(ip_usuario)
 
 if info:
-    print("\nInformación de la IP consultada:")
+    print("\n📡 Información de la IP consultada:")
     print(f"IP: {info.get('ip')}")
     print(f"País: {info.get('country_name')}")
     print(f"Ciudad: {info.get('city')}")
     print(f"Región: {info.get('region')}")
     print(f"Organización: {info.get('org')}")
     print(f"ASN: {info.get('asn')}")
-
-    # Obtener capital usando el código del país (ej: "CL")
-    codigo_pais = info.get("country")
-    capital = obtener_capital(codigo_pais)
-    if capital:
-        print(f"Capital del país: {capital}")
-
     lat = info.get('latitude')
     lon = info.get('longitude')
 
@@ -68,10 +48,10 @@ if info:
             lat = float(lat)
             lon = float(lon)
             distancia_km = calcular_distancia(SANTIAGO_LAT, SANTIAGO_LON, lat, lon)
-            print(f"Distancia aproximada a Santiago, Chile: {distancia_km:.2f} km")
+            print(f"📏 Distancia aproximada a Santiago, Chile: {distancia_km:.2f} km")
         except ValueError:
-            print("Error al procesar las coordenadas.")
+            print("⚠️ Error al procesar las coordenadas.")
     else:
-        print("No se pudo obtener coordenadas geográficas para calcular distancia.")
+        print("⚠️ No se pudo obtener coordenadas geográficas para calcular distancia.")
 else:
-    print("No se pudo obtener la información de la IP.")
+    print("❌ No se pudo obtener la información de la IP.")
